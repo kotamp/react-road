@@ -13,7 +13,7 @@ const list = [
   objectID: 0,
 },
 {
-  title: 'Reactfds',
+  title: 'styled-components',
   url: 'https://reactjs.org/',
   author: 'Jordan Walke',
   num_comments: 3,
@@ -22,12 +22,21 @@ const list = [
 },
 
 {
-  title: 'Reactssd',
+  title: 'redux',
   url: 'https://reactjs.org/',
   author: 'Jordan Walke',
   num_comments: 3,
   points: 4,
   objectID: 2,
+},
+
+{
+  title: 'underscore.js',
+  url: 'https://reactjs.org/',
+  author: 'Jordan Walke',
+  num_comments: 3,
+  points: 4,
+  objectID: 3,
 },
 ];
 
@@ -40,7 +49,7 @@ const WeatherRow = function(props) {
     </tr>
   );
 };
-
+ 
 class ExplainBindingsComponent extends Component {
   constructor() {
     super();
@@ -64,21 +73,43 @@ class ExplainBindingsComponent extends Component {
   }
 }
 
+// function isSearched(searchTerm) {
+//   return function (item) {
+//     return item.title.toLowerCase().includes(searchTerm.toLowerCase());
+//   };
+// }
+
+const isSearched = searchTerm => item =>
+  item.title.toLowerCase().includes(searchTerm.toLowerCase());
+
 class App extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       list: list,
+      searchTerm: ''
     };
 
     this.onDismissBindings = {};
 
-    this.state.list.forEach((e) => {
-      this.onDismissBindings[e.objectID] = 
-        () => this.onDismiss(e.objectID);
-      }
-    );
+    // this.state.list.forEach((e) => {
+    //   this.onDismissBindings[e.objectID] =
+    //     () => this.onDismiss(e.objectID);
+    //   }
+    // );
+
+    this.state.list.forEach(function(e) {
+      this.onDismissBindings[e.objectID] = this.onDismiss.bind(this, e.objectID);
+    }, this);
+
+    this.onSearchChange = this.onSearchChange.bind(this);
+  }
+
+  onSearchChange(event) {
+    // console.log(event);
+    // console.log(Object.prototype.toString.call(event))
+    this.setState({ searchTerm: event.target.value });
   }
 
   onDismiss(id) {
@@ -94,8 +125,14 @@ class App extends Component {
   render() {
     return (
       <div className="App">
+        <form>
+          <input
+            type="text"
+            onChange={this.onSearchChange}
+          />
+        </form>
         <ExplainBindingsComponent />
-        {this.state.list.map((item, index) =>
+        {this.state.list.filter(isSearched(this.state.searchTerm)).map((item, index) =>
           <div key={item.objectID}>
             <span><a href={item.url}>{item.title}</a></span>
             <span>{item.author}</span>
